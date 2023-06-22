@@ -33,6 +33,7 @@ public class MainWindowCtrl implements Initializable {
 
     private List<Arrow> arrowList;
     private List<Round> roundList;
+    private Arrow newArrow;
 
     private EventHandler<MouseEvent> mouseEntered, mouseDragged, mouseExited;
 
@@ -56,31 +57,35 @@ public class MainWindowCtrl implements Initializable {
         if(roundList == null || roundList.size() == 0) return;
 
         mouseEntered = evt -> {
-            Arrow arrow = new Arrow();
+            newArrow = new Arrow();
             Optional<Round> round = getRound(evt.getX(), evt.getY());
             if(round.isEmpty()) {
+                newArrow = null;
                 return;
             }
-            arrow.setRoundOut(round.get());
-            arrowList.add(arrow);
-            canvas_container.getChildren().add(arrow);
+            newArrow.setRoundOut(round.get());
+            arrowList.add(newArrow);
+            canvas_container.getChildren().add(newArrow);
 
         };
         mouseDragged = evt->{
-            Arrow arrow = arrowList.get(arrowList.size() - 1);
-            arrow.setEndX(evt.getX());
-            arrow.setEndY(evt.getY());
+            if( newArrow !=null){
+                newArrow.setEndX(evt.getX());
+                newArrow.setEndY(evt.getY());
+            }
         };
         mouseExited = evt->{
             Optional<Round> round = getRound(evt.getX(), evt.getY());
-            Arrow arrow = arrowList.get(arrowList.size() - 1);
-            if(round.isEmpty()) {
-                arrow.getRoundOut().removeRecentArrowOut();
-                canvas_container.getChildren().remove(arrow);
-                arrowList.remove(arrow);
+            if(round.isEmpty() && newArrow!=null) {
+                newArrow.getRoundOut().removeRecentArrowOut();
+                canvas_container.getChildren().remove(newArrow);
+                arrowList.remove(newArrow);
                 return;
             }
-            arrow.setRoundIn(round.get());
+            if(newArrow!= null) {
+                newArrow.setRoundIn(round.get());
+                newArrow = null;
+            };
         };
         canvas_container.addEventFilter(MouseEvent.MOUSE_PRESSED,mouseEntered);
         canvas_container.addEventFilter( MouseEvent.MOUSE_DRAGGED,mouseDragged);
@@ -108,6 +113,7 @@ public class MainWindowCtrl implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.arrowList = new ArrayList<>();
         this.roundList = new ArrayList<>();
+        Arrow.parent = canvas_container;
     }
     private Optional<Round> getRound(double px, double py){
         for (Round round : roundList) {

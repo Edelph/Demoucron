@@ -2,31 +2,45 @@ package edelph.jhon.shapes;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
+import java.util.Optional;
+
 public class Arrow extends Group {
+    public static Pane parent;
     private final Line line;
     private Line arrow1;
     private Label text;
+    private double height, width;
     private Round roundOut , roundIn;
     private Line arrow2;
+    private static ContextMenu menu;
 
     public Arrow() {
-        this(new Line(), new Line(), new Line());
+        this(new Line(), new Line(), new Line(), new Label("label"));
     }
 
     private static final double arrowLength = 7;
     private static final double arrowWidth = 3;
 
-    private Arrow(Line line, Line arrow1, Line arrow2) {
-        super(line, arrow1, arrow2);
+    private Arrow(Line line, Line arrow1, Line arrow2,Label label) {
+        super(line, arrow1, arrow2, label);
         this.line = line;
         this.arrow1 = arrow1;
         this.arrow2 = arrow2;
+        this.text = label;
+        createContextMenu();
+        addEventMenu();
         event();
 
         InvalidationListener updater = o -> {
@@ -63,13 +77,12 @@ public class Arrow extends Group {
                 arrow2.setStartX(ex + dx + oy);
                 arrow2.setStartY(ey + dy - ox);
                 if(roundOut != null){
-                    text.setLayoutX(roundOut.getCenterX()+ Round.getRadius());
-                    text.setLayoutY(roundOut.getCenterY()+ Round.getRadius());
+                   setText();
                 }
             }
         };
 
-        setText("A1");
+
         // add updater to properties
         startXProperty().addListener(updater);
         startYProperty().addListener(updater);
@@ -84,9 +97,10 @@ public class Arrow extends Group {
         line.setStartX(value);
         line.setEndX(value);
     }
-    private void setText(String value) {
-        text = new Label(value);
-        System.out.println(value);
+
+    private void setText() {
+        text.layoutXProperty().bind(line.startXProperty().add(width/2));
+        text.layoutYProperty().bind(line.startYProperty().add(height/2));
     }
 
     public final double getStartX() {
@@ -140,24 +154,12 @@ public class Arrow extends Group {
         System.out.println("end:");
         System.out.println("x : "+ getEndX()+ " y : "+ getEndY());
     }
-    public void active(){
-        line.setStroke(Color.BLUE);
-        arrow1.setStroke(Color.BLUE);
-        arrow2.setStroke(Color.BLUE);
-    }
-    public void notActive(){
-        line.setStroke(Color.BLACK);
-        arrow1.setStroke(Color.BLACK);
-        arrow2.setStroke(Color.BLACK);
-    }
     public void selected(){
         line.setStroke(Color.RED);
         arrow1.setStroke(Color.RED);
         arrow2.setStroke(Color.RED);
     }
     private void event(){
-        this.setOnMouseEntered(evt->active());
-        this.setOnMouseExited(evt->notActive());
         this.setOnMouseClicked(evt->selected());
     }
 
@@ -184,8 +186,8 @@ public class Arrow extends Group {
         update();
     }
     private void update(){
-        double height = line.getEndY() - line.getStartY();
-        double width = line.getEndX() - line.getStartX();
+        height = line.getEndY() - line.getStartY();
+        width = line.getEndX() - line.getStartX();
         double length = Math.sqrt(Math.pow(height, 2) + Math.pow(width, 2));
 
         double subtractWidth = Round.getRadius() * width / length;
@@ -230,5 +232,21 @@ public class Arrow extends Group {
                 line.setStartY(roundOut.getCenterY() - subtractHeight);
             }
         }
+    }
+    private void addEventMenu(){
+        menu.getItems().get(0).setOnAction(event-> {
+            Optional<String> value = DialogaGetValue.buid("valeur fleche","valeur ??",text.getText());
+            value.ifPresent(s -> text.setText(s.trim()));
+        });
+        menu.getItems().get(1).setOnAction(event-> {
+            parent.getChildren().remove(this);
+        });
+    }
+    private void createContextMenu(){
+        menu = new ContextMenu();
+        MenuItem deleteMenu = new MenuItem("supprimer");
+        MenuItem editMenu = new MenuItem("modifier");
+        menu.getItems().addAll(editMenu, deleteMenu);
+        text.setContextMenu(menu);
     }
 }
