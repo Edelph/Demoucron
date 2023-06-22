@@ -1,0 +1,6 @@
+.Arrow:hover{
+    -fx-stroke: #0730b3;
+}
+#shapesActive{
+    -fx-stroke: #c31371;
+}

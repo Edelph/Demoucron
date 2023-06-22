@@ -31,8 +31,6 @@ public class MainWindowCtrl implements Initializable {
     @FXML
     private Pane canvas_container;
 
-    private List<Arrow> arrowList;
-    private List<Round> roundList;
     private Arrow newArrow;
 
     private EventHandler<MouseEvent> mouseEntered, mouseDragged, mouseExited;
@@ -54,8 +52,7 @@ public class MainWindowCtrl implements Initializable {
     }
     void addArrowListener(){
         remouveALLEvent();
-        if(roundList == null || roundList.size() == 0) return;
-
+        if(Round.roundList == null || Round.roundList.size() == 0) return;
         mouseEntered = evt -> {
             newArrow = new Arrow();
             Optional<Round> round = getRound(evt.getX(), evt.getY());
@@ -64,9 +61,7 @@ public class MainWindowCtrl implements Initializable {
                 return;
             }
             newArrow.setRoundOut(round.get());
-            arrowList.add(newArrow);
             canvas_container.getChildren().add(newArrow);
-
         };
         mouseDragged = evt->{
             if( newArrow !=null){
@@ -76,16 +71,21 @@ public class MainWindowCtrl implements Initializable {
         };
         mouseExited = evt->{
             Optional<Round> round = getRound(evt.getX(), evt.getY());
-            if(round.isEmpty() && newArrow!=null) {
+            if((round.isEmpty() && newArrow!=null)
+                    || (round.isPresent() && round.get() == newArrow.getRoundOut())
+            ) {
                 newArrow.getRoundOut().removeRecentArrowOut();
                 canvas_container.getChildren().remove(newArrow);
-                arrowList.remove(newArrow);
                 return;
             }
             if(newArrow!= null) {
                 newArrow.setRoundIn(round.get());
+                newArrow.addList();
                 newArrow = null;
             };
+            System.out.println("size Arrow : " + Arrow.arrowList.size());
+            System.out.println("size Round : " + Round.roundList.size());
+
         };
         canvas_container.addEventFilter(MouseEvent.MOUSE_PRESSED,mouseEntered);
         canvas_container.addEventFilter( MouseEvent.MOUSE_DRAGGED,mouseDragged);
@@ -95,10 +95,10 @@ public class MainWindowCtrl implements Initializable {
     void addCircleListener(){
         remouveALLEvent();
         mouseEntered = evt->{
-            int id = roundList.size()+1;
-            Round round = new Round(evt.getX(), evt.getY(),id);
-            roundList.add(round);
+            Round round = new Round(evt.getX(), evt.getY());
             canvas_container.getChildren().add(round);
+            System.out.println("size Arrow : " + Arrow.arrowList.size());
+            System.out.println("size Round : " + Round.roundList.size());
         };
         canvas_container.addEventFilter(MouseEvent.MOUSE_CLICKED,mouseEntered);
     }
@@ -111,12 +111,12 @@ public class MainWindowCtrl implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.arrowList = new ArrayList<>();
-        this.roundList = new ArrayList<>();
+        Arrow.arrowList = new ArrayList<>();
+        Round.roundList = new ArrayList<>();
         Arrow.parent = canvas_container;
     }
     private Optional<Round> getRound(double px, double py){
-        for (Round round : roundList) {
+        for (Round round : Round.roundList) {
             if(round.isInArea(px, py)) return Optional.of(round);
         }
         return Optional.empty();

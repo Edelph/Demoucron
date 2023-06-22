@@ -14,9 +14,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Arrow extends Group {
+    public static List<Arrow> arrowList;
     public static Pane parent;
     private final Line line;
     private Line arrow1;
@@ -239,7 +242,7 @@ public class Arrow extends Group {
             value.ifPresent(s -> text.setText(s.trim()));
         });
         menu.getItems().get(1).setOnAction(event-> {
-            parent.getChildren().remove(this);
+            revomeShapes();
         });
     }
     private void createContextMenu(){
@@ -248,5 +251,19 @@ public class Arrow extends Group {
         MenuItem editMenu = new MenuItem("modifier");
         menu.getItems().addAll(editMenu, deleteMenu);
         text.setContextMenu(menu);
+    }
+    public void revomeShapes(){
+        if(roundOut!=null){
+            roundOut.removeArrowOut(this);
+        }
+        if(roundIn!=null){
+            roundIn.removeArrowIn(this);
+        }
+        arrowList.remove(this);
+        parent.getChildren().remove(this);
+    }
+
+    public void addList() {
+        arrowList.add(this);
     }
 }

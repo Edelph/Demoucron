@@ -1,14 +1,21 @@
 package edelph.jhon.shapes;
 
+import javafx.geometry.Side;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Round extends Group{
+    public static ArrayList<Round> roundList;
     private static double radius = 15;
     private double centerX;
     private double centerY;
@@ -17,14 +24,19 @@ public class Round extends Group{
     private Circle circle;
     private List<Arrow> arrowOut;
     private List<Arrow> arrowIn;
-    public Round(double cx, double cy, int name) {
+    private ContextMenu menu;
+    public Round(double cx, double cy) {
         this(new Circle(), new Text());
-        setName(name);
+        setName(roundList.size()+1);
         centerX = cx;
         centerY = cy;
         propertyCircle();
         posText();
         event();
+        createContextMenu();
+        roundList.add(this);
+        this.setOnMouseClicked(this::handleMousePressed);
+        addEventMenu();
     }
     private Round(Circle circle, Text text){
         super(circle, text);
@@ -32,10 +44,12 @@ public class Round extends Group{
         this.text = text;
     }
     private void posText(){
+
         double height = text.getBoundsInLocal().getCenterY();
         double width = text.getBoundsInLocal().getCenterX();
-        text.setX(circle.getCenterX()-(width));
-        text.setY(circle.getCenterY()-(height));
+
+        text.setLayoutX(circle.getCenterX()-(width));
+        text.setLayoutY(circle.getCenterY()-(height));
         System.out.println("eee");
     }
 
@@ -111,5 +125,56 @@ public class Round extends Group{
             arrowOut.remove(arrowOut.size()-1);
         }
     }
+    private void createContextMenu(){
+        menu = new ContextMenu();
+        MenuItem deleteMenu = new MenuItem("supprimer");
+        MenuItem editMenu = new MenuItem("modifier");
+        menu.getItems().addAll(editMenu, deleteMenu);
+    }
+
+    protected void handleMousePressed(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            menu.show((Node)e.getSource(), Side.RIGHT, 3, 5);
+            e.consume();
+        }
+    }
+    private void addEventMenu(){
+        menu.getItems().get(0).setOnAction(event-> {
+            Optional<String> value = DialogaGetValue.buid("Cercle","valeur ??",text.getText());
+            value.ifPresent(s -> text.setText(s.trim()));
+        });
+        menu.getItems().get(1).setOnAction(event-> {
+            revomeShapes();
+        });
+    }
+
+    public void revomeShapes(){
+        if(arrowIn!=null && arrowIn.size()>0) {
+            for (Arrow a: arrowIn) {
+                Round round = a.getRoundOut();
+                round.removeArrowOut(a);
+            }
+            Arrow.arrowList.removeAll(arrowIn);
+            Arrow.parent.getChildren().removeAll(arrowIn);
+        }
+        if(arrowOut!=null && arrowOut.size()>0) {
+            for (Arrow a: arrowOut) {
+                Round round = a.getRoundIn();
+                round.removeArrowIn(a);
+            }
+            Arrow.arrowList.removeAll(arrowOut);
+            Arrow.parent.getChildren().removeAll(arrowOut);
+        }
+        roundList.remove(this);
+        Arrow.parent.getChildren().remove(this);
+    }
+
+    public void removeArrowIn(Arrow arrow) {
+        arrowIn.remove(arrow);
+    }
+    public void removeArrowOut(Arrow arrow) {
+        arrowOut.remove(arrow);
+    }
+
 
 }
