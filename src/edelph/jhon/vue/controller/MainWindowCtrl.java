@@ -23,7 +23,7 @@ public class MainWindowCtrl implements Initializable {
     private Button btn_select;
 
     @FXML
-    private Button btn_arrow;
+    private Button btn_arrow, btnCalculer;
 
     @FXML
     private Button btn_circle;
@@ -39,6 +39,17 @@ public class MainWindowCtrl implements Initializable {
     @FXML
     void btn_arrow_clicked(ActionEvent event) {
         addArrowListener();
+    }
+
+    @FXML
+    void btnCalculer_onclicked(ActionEvent event) {
+        Integer[][] matrice = Round.getMatrice();
+        for (Integer[] row: matrice) {
+            for (Integer c : row ) {
+                System.out.print(c+"  ");
+            }
+            System.out.println("");
+        }
     }
 
     @FXML
@@ -121,4 +132,6 @@ public class MainWindowCtrl implements Initializable {
         }
         return Optional.empty();
     }
+
+
 }

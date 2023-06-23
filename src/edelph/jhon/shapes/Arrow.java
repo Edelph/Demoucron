@@ -266,4 +266,7 @@ public class Arrow extends Group {
     public void addList() {
         arrowList.add(this);
     }
+    public String getValue(){
+        return text.getText();
+    }
 }

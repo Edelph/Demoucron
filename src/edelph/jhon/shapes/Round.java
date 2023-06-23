@@ -175,6 +175,44 @@ public class Round extends Group{
     public void removeArrowOut(Arrow arrow) {
         arrowOut.remove(arrow);
     }
+    private Optional<Arrow> getArrowOut(Round round) {
+        if(arrowOut!=null) {
+            for (Arrow a : arrowOut) {
+                if (a.getRoundIn().getValue().equalsIgnoreCase(round.getValue())) return Optional.of(a);
+            }
+        }
+        return Optional.empty();
+    }
+    private Optional<Arrow> getArrowIn(Round round) {
+        if(arrowIn!=null) {
+            for (Arrow a : arrowIn) {
+                if (a.getRoundOut() == round) return Optional.of(a);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Integer[][] getMatrice(){
+        int dimension = roundList.size();
+        Integer[][] matrice = new Integer[dimension][dimension];
+
+        for (int r = 0; r < dimension; r++) {
+            Round roundout = roundList.get(r);
+            for (int c = 0; c < dimension; c++) {
+                Round roundIn = roundList.get(c);
+                Optional<Arrow> value = roundout.getArrowOut(roundIn);
+                if(value.isPresent()) {
+                    System.out.println(value.get().getValue());
+                    matrice[r][c] = Integer.parseInt(value.get().getValue());
+                }
+            }
+        }
+        return matrice;
+    }
+    public String getValue(){
+        return text.getText().trim();
+    }
+
 
 
 }
