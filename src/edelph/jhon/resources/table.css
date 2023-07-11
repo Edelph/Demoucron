@@ -1,0 +1,10 @@
+.label{
+    -fx-min-width: 25px;
+    -fx-pref-height: 15px;
+    -fx-padding: 2px 5px 2px 5px ;
+    -fx-alignment: center;
+}
+
+.table{
+    -fx-padding: 10px 20px 10px 10px ;
+}

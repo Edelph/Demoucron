@@ -4,3 +4,11 @@
 #shapesActive{
     -fx-stroke: #c31371;
 }
+
+.Label{
+    -fx-min-width: 50px;
+    -fx-min-height: 25px;
+}
+.GridPanel{
+    -fx-padding: 10px;
+}

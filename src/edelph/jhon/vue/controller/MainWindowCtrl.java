@@ -1,23 +1,31 @@
 package edelph.jhon.vue.controller;
 
 import edelph.jhon.shapes.Arrow;
+import edelph.jhon.shapes.Demoucron;
 import edelph.jhon.shapes.Round;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseDragEvent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainWindowCtrl implements Initializable {
+
+    @FXML
+    private HBox contentTab;
+
+    private VBox listTabContent;
+    private ScrollPane scrollPane;
 
     @FXML
     private Button btn_select;
@@ -32,6 +40,7 @@ public class MainWindowCtrl implements Initializable {
     private Pane canvas_container;
 
     private Arrow newArrow;
+    private Stage stage;
 
     private EventHandler<MouseEvent> mouseEntered, mouseDragged, mouseExited;
 
@@ -43,13 +52,39 @@ public class MainWindowCtrl implements Initializable {
 
     @FXML
     void btnCalculer_onclicked(ActionEvent event) {
-        Integer[][] matrice = Round.getMatrice();
-        for (Integer[] row: matrice) {
-            for (Integer c : row ) {
-                System.out.print(c+"  ");
+        if(scrollPane != null ) contentTab.getChildren().remove(scrollPane);
+        scrollPane = new ScrollPane();
+        listTabContent = new VBox();
+        scrollPane.setContent(listTabContent);
+
+        Round.initialize();
+        Arrow.initialize();
+
+        Demoucron demoucron = new Demoucron(Round.getMatrice());
+        List<List<Integer>> matrice = demoucron.getMatrice();
+        listTabContent.getChildren().add(TableController.build(demoucron));
+
+        for (int i = 0; i < matrice.size(); i++) {
+            if(demoucron.isCalculable(i)){
+                demoucron.calculateAllWij(i);
+                listTabContent.getChildren().add(TableController.build(demoucron,i));
             }
-            System.out.println("");
         }
+        listTabContent.setSpacing(10);
+        scrollPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/edelph/jhon/resources/table.css")).toExternalForm());
+        contentTab.getChildren().add(scrollPane);
+        scrollPane.setMaxHeight(347);
+        scrollPane.setPannable(true);
+//        listTabContent.setPadding(new Insets(10, 5, 0, 0));
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setFitToHeight(false);
+        stage.sizeToScene();
+        Round.setChemin(demoucron.cheminMin());
+    }
+
+    void showTable(Demoucron demoucron) {
+        listTabContent = new VBox();
     }
 
     @FXML
@@ -94,9 +129,6 @@ public class MainWindowCtrl implements Initializable {
                 newArrow.addList();
                 newArrow = null;
             };
-            System.out.println("size Arrow : " + Arrow.arrowList.size());
-            System.out.println("size Round : " + Round.roundList.size());
-
         };
         canvas_container.addEventFilter(MouseEvent.MOUSE_PRESSED,mouseEntered);
         canvas_container.addEventFilter( MouseEvent.MOUSE_DRAGGED,mouseDragged);
@@ -108,8 +140,6 @@ public class MainWindowCtrl implements Initializable {
         mouseEntered = evt->{
             Round round = new Round(evt.getX(), evt.getY());
             canvas_container.getChildren().add(round);
-            System.out.println("size Arrow : " + Arrow.arrowList.size());
-            System.out.println("size Round : " + Round.roundList.size());
         };
         canvas_container.addEventFilter(MouseEvent.MOUSE_CLICKED,mouseEntered);
     }
@@ -133,5 +163,7 @@ public class MainWindowCtrl implements Initializable {
         return Optional.empty();
     }
 
-
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 }

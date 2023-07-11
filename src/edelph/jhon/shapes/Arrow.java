@@ -2,23 +2,18 @@ package edelph.jhon.shapes;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.text.Text;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class Arrow extends Group {
+    private boolean isChemin = false;
     public static List<Arrow> arrowList;
     public static Pane parent;
     private final Line line;
@@ -30,7 +25,7 @@ public class Arrow extends Group {
     private static ContextMenu menu;
 
     public Arrow() {
-        this(new Line(), new Line(), new Line(), new Label("label"));
+        this(new Line(), new Line(), new Line(), new Label("0"));
     }
 
     private static final double arrowLength = 7;
@@ -161,9 +156,38 @@ public class Arrow extends Group {
         line.setStroke(Color.RED);
         arrow1.setStroke(Color.RED);
         arrow2.setStroke(Color.RED);
+        isChemin = true;
+    }
+    private void notSelected(){
+        line.setStroke(Color.BLACK);
+        arrow1.setStroke(Color.BLACK);
+        arrow2.setStroke(Color.BLACK);
+        isChemin = false;
+    }
+    public static void initialize(){
+        for (Arrow a : arrowList) {
+            a.notSelected();
+        }
+    }
+    private void hover(){
+        line.setStroke(Color.GREEN);
+        arrow1.setStroke(Color.GREEN);
+        arrow2.setStroke(Color.GREEN);
+    }
+    private void NotHover(){
+        if(isChemin){
+            line.setStroke(Color.RED);
+            arrow1.setStroke(Color.RED);
+            arrow2.setStroke(Color.RED);
+        }else{
+            line.setStroke(Color.BLACK);
+            arrow1.setStroke(Color.BLACK);
+            arrow2.setStroke(Color.BLACK);
+        }
     }
     private void event(){
-        this.setOnMouseClicked(evt->selected());
+        this.setOnMouseEntered(evt->hover());
+        this.setOnMouseExited(evt->NotHover());
     }
 
     public Round getRoundOut() {

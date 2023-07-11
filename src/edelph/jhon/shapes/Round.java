@@ -62,6 +62,12 @@ public class Round extends Group{
         circle.setStrokeWidth(1d);
     }
 
+    public static void initialize(){
+        for (Round r : roundList) {
+            r.setNonActive();
+        }
+    }
+
     public void setRadius(double radius){
         Round.radius=radius;
         circle.setRadius(Round.radius);
@@ -95,6 +101,11 @@ public class Round extends Group{
     private void setNonActive(){
         circle.setStroke(Color.BLACK);
         text.setFill(Color.BLACK);
+    }
+
+    private void setColorChinmin(){
+        text.setFill(Color.BLACK);
+        circle.setFill(Color.YELLOW);
     }
 
     public static double getRadius() {
@@ -192,6 +203,19 @@ public class Round extends Group{
         return Optional.empty();
     }
 
+    public static void setChemin(List<Integer> chemin){
+        Round roundLast = null;
+        for ( Integer round_index : chemin ){
+            Round activeRound = roundList.get(round_index);
+            activeRound.setColorChinmin();
+            if(roundLast != null){
+                Optional<Arrow> optionalArrow = roundLast.getArrowIn(activeRound);
+                optionalArrow.ifPresent(Arrow::selected);
+            }
+            roundLast = activeRound;
+        }
+    }
+
     public static Integer[][] getMatrice(){
         int dimension = roundList.size();
         Integer[][] matrice = new Integer[dimension][dimension];
@@ -201,10 +225,7 @@ public class Round extends Group{
             for (int c = 0; c < dimension; c++) {
                 Round roundIn = roundList.get(c);
                 Optional<Arrow> value = roundout.getArrowOut(roundIn);
-                if(value.isPresent()) {
-                    System.out.println(value.get().getValue());
-                    matrice[r][c] = Integer.parseInt(value.get().getValue());
-                }
+                matrice[r][c] = value.map(arrow -> Integer.parseInt(arrow.getValue())).orElse(-1);
             }
         }
         return matrice;
@@ -212,7 +233,4 @@ public class Round extends Group{
     public String getValue(){
         return text.getText().trim();
     }
-
-
-
 }
