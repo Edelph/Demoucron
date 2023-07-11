@@ -29,4 +29,7 @@
          </BorderPane.margin>
       </HBox>
    </center>
+   <top>
+      <VBox fx:id="titre" prefHeight="36.0" prefWidth="570.0" BorderPane.alignment="CENTER" />
+   </top>
 </BorderPane>

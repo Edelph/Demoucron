@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -20,6 +21,8 @@ import java.net.URL;
 import java.util.*;
 
 public class MainWindowCtrl implements Initializable {
+    @FXML
+    private VBox titre;
 
     @FXML
     private HBox contentTab;
@@ -52,6 +55,7 @@ public class MainWindowCtrl implements Initializable {
 
     @FXML
     void btnCalculer_onclicked(ActionEvent event) {
+        if( Round.roundList == null || Round.roundList.size() == 0) return;
         if(scrollPane != null ) contentTab.getChildren().remove(scrollPane);
         scrollPane = new ScrollPane();
         listTabContent = new VBox();
@@ -152,6 +156,8 @@ public class MainWindowCtrl implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Label titleLabel = new Label("Algorithm Demoucron");
+        titre.getChildren().add(titleLabel);
         Arrow.arrowList = new ArrayList<>();
         Round.roundList = new ArrayList<>();
         Arrow.parent = canvas_container;

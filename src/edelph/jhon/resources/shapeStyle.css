@@ -12,3 +12,15 @@
 .GridPanel{
     -fx-padding: 10px;
 }
+#titre .label {
+    -fx-alignment: center;
+    -fx-font-size: 25px;
+    -fx-font: 900;
+    -fx-fill-height: true;
+    -fx-fill-width: true;
+}
+#titre{
+    -fx-background-color: #8fadff;
+    -fx-alignment: center;
+
+}
