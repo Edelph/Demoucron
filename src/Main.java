@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -20,7 +21,8 @@ public class Main extends Application {
         controller.setStage(primaryStage);
         root.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/edelph/jhon/resources/shapeStyle.css")).toExternalForm());
         primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle("Algorithm Demmoucron");
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/edelph/jhon/resources/neural.png"))));
+        primaryStage.setTitle("Algorithm Demoucron");
         primaryStage.setResizable(false);
         primaryStage.show();
     }
